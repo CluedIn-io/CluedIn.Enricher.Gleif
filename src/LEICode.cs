@@ -76,10 +76,12 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             if (code.Length != 20)
                 return false;
 
-            if (decimal.TryParse(ReplaceCharacters(code), out var checkData))
-                return checkData % 97 == 1;
+            // TODO Fix this validation, currently not letting valid LEI code through
+            //            if (decimal.TryParse(ReplaceCharacters(code), out var checkData))
+            //                return checkData % 97 == 1;
 
-            return false;
+
+            return true;
         }
 
         /// <summary>
