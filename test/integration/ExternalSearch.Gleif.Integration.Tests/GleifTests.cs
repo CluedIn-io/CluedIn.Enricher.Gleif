@@ -14,7 +14,7 @@ using CluedIn.Testing.Base.Processing.Actors;
 using Moq;
 using Xunit;
 
-namespace CluedIn.Tests.Integration.ExternalSearch
+namespace ExternalSearch.Gleif.Integration.Tests
 {
     public class GleifTests : IDisposable
     {
