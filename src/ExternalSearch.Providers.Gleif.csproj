@@ -19,10 +19,10 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\cluedin.png" />
+      <None Remove="Resources\gleif.jpeg" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\cluedin.png" />
+    <EmbeddedResource Include="Resources\gleif.jpeg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CluedIn.ExternalSearch" Version="2.6.0-alpha0003" />
