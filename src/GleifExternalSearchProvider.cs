@@ -15,17 +15,21 @@ using System.Net;
 using CluedIn.Core;
 using CluedIn.Core.Data;
 using CluedIn.Core.Data.Parts;
+using CluedIn.Core.Data.Relational;
+using CluedIn.Core.ExternalSearch;
+using CluedIn.Core.Providers;
 using CluedIn.ExternalSearch.Providers.Gleif.Models;
 using CluedIn.ExternalSearch.Providers.Gleif.Vocabularies;
 
 using RestSharp;
 using Newtonsoft.Json;
- 
+using EntityType = CluedIn.Core.Data.EntityType;
+
 namespace CluedIn.ExternalSearch.Providers.Gleif
 {
     /// <summary>The gleif graph external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
-    public class GleifExternalSearchProvider : ExternalSearchProviderBase
+    public class GleifExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata
     {
         public static readonly Guid ProviderId = Guid.Parse("6d47d335-2bf3-4249-88c4-0f08d322c24c");   // TODO: Replace value
 
@@ -250,5 +254,13 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                 
             return null;
         }
+
+        public string Icon { get; } = "Resources.gleif.jpeg";
+        public string Domain { get; } = "https://www.gleif.org/en";
+        public string About { get; } = "Gleif is enricher which is tasked to support the implementation and use of Legal Entity Identifier";
+        public AuthMethods AuthMethods { get; } = null;
+        public IEnumerable<Control> Properties { get; } = null;
+        public Guide Guide { get; } = null;
+        public IntegrationType Type { get; } = IntegrationType.Cloud;
     }
 }
