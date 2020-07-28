@@ -36,22 +36,22 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         /**********************************************************************************************************
          * CONSTRUCTORS
          **********************************************************************************************************/
- 
+
         public GleifExternalSearchProvider()
             : base(ProviderId, EntityType.Organization)
         {
         }
- 
+
         /**********************************************************************************************************
          * METHODS
          **********************************************************************************************************/
- 
+
         /// <inheritdoc/>
         public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request)
         {
             if (!this.Accepts(request.EntityMetaData.EntityType))
                 yield break;
- 
+
             var entityType       = request.EntityMetaData.EntityType;
             var leiCodes         = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesLeiCode, new HashSet<string>());
 
@@ -63,7 +63,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                     yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Identifier, value);
             }
         }
- 
+
         /// <inheritdoc/>
         public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query)
         {
@@ -71,13 +71,13 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 
             if (string.IsNullOrEmpty(leiCode))
                 yield break;
- 
+
             var client = new RestClient("https://leilookup.gleif.org/api/v2/leirecords");
- 
+
             var request = new RestRequest("?lei=" + leiCode, Method.GET);
 
-            var response = client.ExecuteTaskAsync(request).Result;
- 
+            var response = client.ExecuteAsync(request).Result;
+
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 // HACK: Removes the outer array from json string
@@ -95,21 +95,21 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             else
                 throw new ApplicationException("Could not execute external search query - StatusCode:" + response.StatusCode + "; Content: " + response.Content);
         }
- 
+
         /// <inheritdoc/>
         public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
             var resultItem = result.As<GleifResponse>();
- 
+
             var code = this.GetOriginEntityCode(resultItem);
- 
+
             var clue = new Clue(code, context.Organization);
- 
+
             this.PopulateMetadata(clue.Data.EntityData, resultItem);
- 
+
             return new[] { clue };
         }
- 
+
         /// <inheritdoc/>
         public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
@@ -129,12 +129,12 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<GleifResponse> resultItem)
         {
             var metadata = new EntityMetadataPart();
- 
+
             this.PopulateMetadata(metadata, resultItem);
- 
+
             return metadata;
         }
- 
+
         /// <summary>Gets the origin entity code.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The origin entity code.</returns>
@@ -142,14 +142,14 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         {
             return new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.Lei.Value);
         }
- 
+
         /// <summary>Gets the code origin.</summary>
         /// <returns>The code origin</returns>
         private CodeOrigin GetCodeOrigin()
         {
             return CodeOrigin.CluedIn.CreateSpecific("gleif");
         }
- 
+
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultItem">The result item.</param>
@@ -157,7 +157,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         {
             var code = this.GetOriginEntityCode(resultItem);
             var data = resultItem.Data;
- 
+
             metadata.EntityType       = EntityType.Organization;
             metadata.Name             = data.Entity.LegalName?.Value;
             metadata.OriginEntityCode = code;
@@ -182,8 +182,8 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             metadata.Properties[GleifVocabularies.Organization.LegalAddress.PostalCode]                     = data.Entity.LegalAddress?.PostalCode?.Value;
             metadata.Properties[GleifVocabularies.Organization.LegalJurisdiction]                           = data.Entity.LegalJurisdiction?.Value;
             metadata.Properties[GleifVocabularies.Organization.LegalFormCode]                               = data.Entity.LegalForm?.EntityLegalFormCode?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalFormType]                               = data.Entity.LegalForm?.OtherLegalForm?.Value;                                 
-                                       
+            metadata.Properties[GleifVocabularies.Organization.LegalFormType]                               = data.Entity.LegalForm?.OtherLegalForm?.Value;
+
             // Headquarters
             metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Address]                 = data.Entity.HeadquartersAddress?.FirstAddressLine?.Value;
             metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Number]                  = data.Entity.HeadquartersAddress?.AddressNumber?.Value;
@@ -215,7 +215,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             //metadata.Properties[GleifVocabularies.Organization.OtherAddressCities]                       = JoinValues(data.Entity.OtherAddresses?.Addresses, x => x?.City?.Value);
             //metadata.Properties[GleifVocabularies.Organization.OtherAddressCountryCodes]                 = JoinValues(data.Entity.OtherAddresses?.Addresses, x => x?.Country.Value);
             //metadata.Properties[GleifVocabularies.Organization.OtherAddressPostalCodes]                  = JoinValues(data.Entity.OtherAddresses?.Addresses, x => x?.PostalCode?.Value);
-            
+
             metadata.Properties[GleifVocabularies.Organization.OtherEntityNames]                            = JoinValues(data.Entity.OtherEntityNames?.Names, x => x?.Value);
 
             // Registration
@@ -251,7 +251,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             {
                 return String.Join(separator, items.Where(x => !String.IsNullOrEmpty(property(x))).ToList().ConvertAll(x => property(x)));
             }
-                
+
             return null;
         }
 
