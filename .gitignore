@@ -269,3 +269,5 @@ NDependOut/
 
 # Build artifacts
 Test-*.XML
+
+.DS_Store
