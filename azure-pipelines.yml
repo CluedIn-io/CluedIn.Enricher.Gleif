@@ -3,14 +3,9 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 trigger:
   branches:
     include:
-    - master
     - develop
-  tags:
-    include:
-      - v*
-  paths:
-    exclude:
-    - '*.md'
+    - master
+    - release/*
 
 pr:
   branches:
@@ -18,9 +13,6 @@ pr:
     - develop
     - master
     - release/*
-  paths:
-    exclude:
-    - '*.md'
 
 resources:
   repositories:
