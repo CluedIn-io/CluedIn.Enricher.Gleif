@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <EmbeddedResource Include="Resources\gleif.jpeg" />
+    <None Remove="Resources\gleif.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\gleif.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CluedIn.Core" />

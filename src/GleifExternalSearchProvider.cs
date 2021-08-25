@@ -255,7 +255,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             return null;
         }
 
-        public string Icon { get; } = "Resources.gleif.jpeg";
+        public string Icon { get; } = "Resources.gleif.png";
         public string Domain { get; } = "https://www.gleif.org/en";
         public string About { get; } = "Gleif is an enricher which provides information using the Legal Entity Identifier (LEI) of an organization";
         public AuthMethods AuthMethods { get; } = null;
