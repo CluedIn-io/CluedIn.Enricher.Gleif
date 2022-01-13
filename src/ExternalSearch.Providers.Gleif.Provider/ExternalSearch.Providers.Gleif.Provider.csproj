@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>CluedIn.Provider.Gleif</AssemblyName>
+    <RootNamespace>CluedIn.Provider.Gleif</RootNamespace>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CluedIn.Core" />
+    <PackageReference Include="ComponentHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExternalSearch.Providers.Gleif\ExternalSearch.Providers.Gleif.csproj" />
+  </ItemGroup>
+
+</Project>

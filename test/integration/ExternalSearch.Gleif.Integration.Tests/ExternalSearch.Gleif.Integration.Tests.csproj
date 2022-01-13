@@ -1,8 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="CluedIn.Testing.Base"/>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\ExternalSearch.Providers.Gleif.csproj"/>
+    <PackageReference Include="CluedIn.Testing.Base" />
   </ItemGroup>
 </Project>
