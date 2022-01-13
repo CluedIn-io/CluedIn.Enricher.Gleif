@@ -52,7 +52,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Gleif.Integr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.Gleif", "src\ExternalSearch.Providers.Gleif\ExternalSearch.Providers.Gleif.csproj", "{E2B3C7B0-6CAD-4062-A5DD-813A2991D35D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.Gleif.Provider", "src\ExternalSearch.Providers.Gleif.Provider\ExternalSearch.Providers.Gleif.Provider.csproj", "{0823A971-3697-4F7D-B993-B8C90B76CBE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Provider.ExternalSearch.Gleif", "src\ExternalSearch.Providers.Gleif.Provider\Provider.ExternalSearch.Gleif.csproj", "{0823A971-3697-4F7D-B993-B8C90B76CBE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
