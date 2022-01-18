@@ -1,30 +1,29 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif.Models
 {
+
     public class Registration
     {
-        [JsonProperty("InitialRegistrationDate")]
-        public DataValue InitialRegistrationDate { get; set; }
+        [JsonProperty("initialRegistrationDate")]
+        public string InitialRegistrationDate { get; set; }
 
-        [JsonProperty("LastUpdateDate")]
-        public DataValue LastUpdateDate { get; set; }
+        [JsonProperty("lastUpdateDate")] public string LastUpdateDate { get; set; }
 
-        [JsonProperty("RegistrationStatus")]
-        public DataValue RegistrationStatus { get; set; }
+        [JsonProperty("status")] public string Status { get; set; }
 
-        [JsonProperty("NextRenewalDate")]
-        public DataValue NextRenewalDate { get; set; }
+        [JsonProperty("nextRenewalDate")] public string NextRenewalDate { get; set; }
 
-        [JsonProperty("ManagingLOU")]
-        public DataValue ManagingLou { get; set; }
+        [JsonProperty("managingLou")] public string ManagingLou { get; set; }
 
-        [JsonProperty("ValidationSources")]
-        public DataValue ValidationSources { get; set; }
+        [JsonProperty("corroborationLevel")] public string CorroborationLevel { get; set; }
 
-        [JsonProperty("ValidationAuthority")]
-        public ValidationAuthority ValidationAuthority { get; set; }
+        [JsonProperty("validatedAt")] public ValidatedAt ValidatedAt { get; set; }
 
-        // OtherValidationAuthorities
+        [JsonProperty("validatedAs")] public string ValidatedAs { get; set; }
+
+        [JsonProperty("otherValidationAuthorities")]
+        public List<object> OtherValidationAuthorities { get; set; }
     }
 }
