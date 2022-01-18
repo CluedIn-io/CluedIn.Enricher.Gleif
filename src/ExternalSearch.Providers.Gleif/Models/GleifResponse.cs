@@ -7,9 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using Castle.Windsor.Configuration.Interpreters.XmlProcessor.ElementProcessors;
 using Newtonsoft.Json;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif.Models
@@ -31,11 +29,11 @@ namespace CluedIn.ExternalSearch.Providers.Gleif.Models
         [JsonProperty("meta")]
         public Metadata Meta { get; set; }
 
-        [JsonProperty("meta")]
+        [JsonProperty("links")]
         public Links Links { get; set; }
 
         [JsonProperty("data")]
-        public Data Data { get; set; }
+        public List<Data> Data { get; set; }
     }
 
     public class Data
