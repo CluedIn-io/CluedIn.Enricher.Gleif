@@ -7,19 +7,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif.Models
 {
     public class GleifResponse
     {
-        [JsonProperty("LEI")]
-        public DataValue Lei { get; set; }
+        [JsonProperty("meta")]
+        public Metadata Meta { get; set; }
 
-        [JsonProperty("Entity")]
-        public Entity Entity { get; set; }
+        [JsonProperty("links")]
+        public Links Links { get; set; }
 
-        [JsonProperty("Registration")]
-        public Registration Registration { get; set; }
+        [JsonProperty("data")]
+        public List<Data> Data { get; set; }
     }
 }

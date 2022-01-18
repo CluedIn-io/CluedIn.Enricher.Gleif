@@ -2,8 +2,7 @@ using Newtonsoft.Json;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif.Models
 {
-
-    public class LegalForm
+    public class RegisteredAt
     {
         [JsonProperty("id")] public string Id { get; set; }
 
