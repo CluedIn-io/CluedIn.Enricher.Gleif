@@ -20,7 +20,6 @@ using CluedIn.Core.ExternalSearch;
 using CluedIn.Core.Providers;
 using CluedIn.ExternalSearch.Providers.Gleif.Models;
 using CluedIn.ExternalSearch.Providers.Gleif.Vocabularies;
-using EasyNetQ.Events;
 using RestSharp;
 using Newtonsoft.Json;
 using EntityType = CluedIn.Core.Data.EntityType;
@@ -140,7 +139,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         /// <returns>The origin entity code.</returns>
         private EntityCode GetOriginEntityCode(IExternalSearchQueryResult<GleifResponse> resultItem)
         {
-            return new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.Lei.Value);
+            return new EntityCode(EntityType.Organization, this.GetCodeOrigin(), resultItem.Data.Data.Attributes.Lei);
         }
 
         /// <summary>Gets the code origin.</summary>
@@ -159,41 +158,38 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             var data = resultItem.Data;
 
             metadata.EntityType       = EntityType.Organization;
-            metadata.Name             = data.Entity.LegalName?.Value;
+            metadata.Name             = data.Data.Attributes.Entity.LegalName?.Name;
             metadata.OriginEntityCode = code;
 
             metadata.Codes.Add(code);
 
-            if (data.Entity.OtherEntityNames?.Names != null)
-                metadata.Aliases.AddRange(data.Entity.OtherEntityNames?.Names.Select(v => v.Value));
+            if (data.Data.Attributes.Entity.OtherNames != null)
+                metadata.Aliases.AddRange(data.Data.Attributes.Entity?.OtherNames.Select(v => v.Name));
 
-            metadata.Properties[GleifVocabularies.Organization.LeiCode]                                     = data.Lei.Value;
+            metadata.Properties[GleifVocabularies.Organization.LeiCode]                                     = data.Data.Attributes.Lei;
 
             // Legal
-            metadata.Properties[GleifVocabularies.Organization.LegalName]                                   = data.Entity.LegalName?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.Address]                        = data.Entity.LegalAddress?.FirstAddressLine?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.Number]                         = data.Entity.LegalAddress?.AddressNumber?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.NumberWithinBuilding]           = data.Entity.LegalAddress?.AddressNumberWithinBuilding?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.MailRouting]                    = data.Entity.LegalAddress?.MailRouting?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.AdditionalAddress]              = JoinValues(data.Entity.LegalAddress?.AdditionalAddressLine, x => x?.Value);
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.Region]                         = data.Entity.LegalAddress?.Region?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.City]                           = data.Entity.LegalAddress?.City?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.CountryCode]                    = data.Entity.LegalAddress?.Country?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalAddress.PostalCode]                     = data.Entity.LegalAddress?.PostalCode?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalJurisdiction]                           = data.Entity.LegalJurisdiction?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalFormCode]                               = data.Entity.LegalForm?.EntityLegalFormCode?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LegalFormType]                               = data.Entity.LegalForm?.OtherLegalForm?.Value;
+            metadata.Properties[GleifVocabularies.Organization.LegalName]                                   = data.Data.Attributes.Entity.LegalName?.Name;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.Address]                        = JoinValues(data.Data.Attributes.Entity.LegalAddress?.AddressLines, x => x, ", ");
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.Number]                         = data.Data.Attributes.Entity.LegalAddress?.AddressNumber;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.NumberWithinBuilding]           = data.Data.Attributes.Entity.LegalAddress?.AddressNumberWithinBuilding;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.MailRouting]                    = data.Data.Attributes.Entity.LegalAddress?.MailRouting;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.Region]                         = data.Data.Attributes.Entity.LegalAddress?.Region;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.City]                           = data.Data.Attributes.Entity.LegalAddress?.City;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.CountryCode]                    = data.Data.Attributes.Entity.LegalAddress?.Country;
+            metadata.Properties[GleifVocabularies.Organization.LegalAddress.PostalCode]                     = data.Data.Attributes.Entity.LegalAddress?.PostalCode;
+            metadata.Properties[GleifVocabularies.Organization.LegalJurisdiction]                           = data.Data.Attributes.Entity.Jurisdiction;
+            metadata.Properties[GleifVocabularies.Organization.LegalFormCode]                               = data.Data.Attributes.Entity.LegalForm?.Id;
 
             // Headquarters
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Address]                 = data.Entity.HeadquartersAddress?.FirstAddressLine?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Number]                  = data.Entity.HeadquartersAddress?.AddressNumber?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.NumberWithinBuilding]    = data.Entity.HeadquartersAddress?.AddressNumberWithinBuilding?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.MailRouting]             = data.Entity.HeadquartersAddress?.MailRouting?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.AdditionalAddress]       = JoinValues(data.Entity.HeadquartersAddress?.AdditionalAddressLine, x => x?.Value);
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Region]                  = data.Entity.HeadquartersAddress?.Region?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.City]                    = data.Entity.HeadquartersAddress?.City?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.CountryCode]             = data.Entity.HeadquartersAddress?.Country?.Value;
-            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.PostalCode]              = data.Entity.HeadquartersAddress?.PostalCode?.Value;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Address]                 = JoinValues(data.Data.Attributes.Entity.HeadquartersAddress?.AddressLines, x => x, ", ");
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Number]                  = data.Data.Attributes.Entity.HeadquartersAddress?.AddressNumber;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.NumberWithinBuilding]    = data.Data.Attributes.Entity.HeadquartersAddress?.AddressNumberWithinBuilding;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.MailRouting]             = data.Data.Attributes.Entity.HeadquartersAddress?.MailRouting;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.Region]                  = data.Data.Attributes.Entity.HeadquartersAddress?.Region;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.City]                    = data.Data.Attributes.Entity.HeadquartersAddress?.City;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.CountryCode]             = data.Data.Attributes.Entity.HeadquartersAddress?.Country;
+            metadata.Properties[GleifVocabularies.Organization.HeadquartersAddress.PostalCode]              = data.Data.Attributes.Entity.HeadquartersAddress?.PostalCode;
 
             // TODO: Fix this
 
@@ -216,26 +212,26 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             //metadata.Properties[GleifVocabularies.Organization.OtherAddressCountryCodes]                 = JoinValues(data.Entity.OtherAddresses?.Addresses, x => x?.Country.Value);
             //metadata.Properties[GleifVocabularies.Organization.OtherAddressPostalCodes]                  = JoinValues(data.Entity.OtherAddresses?.Addresses, x => x?.PostalCode?.Value);
 
-            metadata.Properties[GleifVocabularies.Organization.OtherEntityNames]                            = JoinValues(data.Entity.OtherEntityNames?.Names, x => x?.Value);
+            metadata.Properties[GleifVocabularies.Organization.OtherEntityNames]                            = JoinValues(data.Data.Attributes.Entity?.OtherNames, x => x?.Name);
 
             // Registration
-            metadata.Properties[GleifVocabularies.Organization.RegistrationAuthorityId]                     = data.Entity.RegistrationAuthority?.RegistrationAuthorityId?.Value;
-            metadata.Properties[GleifVocabularies.Organization.OtherRegistrationAuthorityId]                = data.Entity.RegistrationAuthority?.OtherRegistrationAuthorityId?.Value;
-            metadata.Properties[GleifVocabularies.Organization.RegistrationAuthorityEntityId]               = data.Entity.RegistrationAuthority?.RegistrationAuthorityEntityId?.Value;
-            metadata.Properties[GleifVocabularies.Organization.InitialRegistrationDate]                     = data.Registration.InitialRegistrationDate?.Value;
-            metadata.Properties[GleifVocabularies.Organization.LastUpdateDate]                              = data.Registration.LastUpdateDate?.Value;
-            metadata.Properties[GleifVocabularies.Organization.RegistrationStatus]                          = data.Registration.RegistrationStatus?.Value;
-            metadata.Properties[GleifVocabularies.Organization.NextRenewalDate]                             = data.Registration.NextRenewalDate?.Value;
-            metadata.Properties[GleifVocabularies.Organization.ManagingLOU]                                 = data.Registration.ManagingLou?.Value;
+            //metadata.Properties[GleifVocabularies.Organization.RegistrationAuthorityId]                     = data.Data.Attributes.Registration?.RegistrationAuthorityId?.Value;
+            //metadata.Properties[GleifVocabularies.Organization.OtherRegistrationAuthorityId]                = data.Data.Attributes.Registration?.OtherRegistrationAuthorityId?.Value;
+            //metadata.Properties[GleifVocabularies.Organization.RegistrationAuthorityEntityId]               = data.Data.Attributes.Registration?.RegistrationAuthorityEntityId?.Value;
+            metadata.Properties[GleifVocabularies.Organization.InitialRegistrationDate]                     = data.Data.Attributes.Registration.InitialRegistrationDate;
+            metadata.Properties[GleifVocabularies.Organization.LastUpdateDate]                              = data.Data.Attributes.Registration.LastUpdateDate;
+            metadata.Properties[GleifVocabularies.Organization.RegistrationStatus]                          = data.Data.Attributes.Registration.Status;
+            metadata.Properties[GleifVocabularies.Organization.NextRenewalDate]                             = data.Data.Attributes.Registration.NextRenewalDate;
+            metadata.Properties[GleifVocabularies.Organization.ManagingLOU]                                 = data.Data.Attributes.Registration.ManagingLou;
 
             // Validation
-            metadata.Properties[GleifVocabularies.Organization.EntityStatus]                                = data.Entity.EntityStatus?.Value;
-            metadata.Properties[GleifVocabularies.Organization.ValidationSources]                           = data.Registration.ValidationSources?.Value;
-            metadata.Properties[GleifVocabularies.Organization.ValidationAuthorityId]                       = data.Registration.ValidationAuthority?.ValidationAuthorityId?.Value;
-            metadata.Properties[GleifVocabularies.Organization.OtherValidationAuthorityId]                  = data.Registration.ValidationAuthority?.OtherValidationAuthorityId?.Value;
-            metadata.Properties[GleifVocabularies.Organization.ValidationAuthorityEntityId]                 = data.Registration.ValidationAuthority?.ValidationAuthorityEntityId?.Value;
+            metadata.Properties[GleifVocabularies.Organization.EntityStatus]                                = data.Data.Attributes.Entity.Status;
+            //metadata.Properties[GleifVocabularies.Organization.ValidationSources]                           = data.Data.Attributes.Registration.ValidationSources?.Value;
+            //metadata.Properties[GleifVocabularies.Organization.ValidationAuthorityId]                       = data.Data.Attributes.Registration.ValidationAuthority?.ValidationAuthorityId?.Value;
+            //metadata.Properties[GleifVocabularies.Organization.OtherValidationAuthorityId]                  = data.Data.Attributes.Registration.ValidationAuthority?.OtherValidationAuthorityId?.Value;
+            //metadata.Properties[GleifVocabularies.Organization.ValidationAuthorityEntityId]                 = data.Data.Attributes.Registration.ValidationAuthority?.ValidationAuthorityEntityId?.Value;
 
-            metadata.Properties[GleifVocabularies.Organization.EntityCategory]                              = data.Entity.EntityCategory?.Value;
+            metadata.Properties[GleifVocabularies.Organization.EntityCategory]                              = data.Data.Attributes.Entity.Category;
         }
 
         /// <summary>
