@@ -1,12 +1,13 @@
+using System;
 using Newtonsoft.Json;
 
-namespace CluedIn.ExternalSearch.Providers.Gleif.Models;
-
-public class Expiration
+namespace CluedIn.ExternalSearch.Providers.Gleif.Models
 {
-    [JsonProperty("date")]
-    public object Date { get; set; }
 
-    [JsonProperty("reason")]
-    public object Reason { get; set; }
+    public class Expiration
+    {
+        [JsonProperty("date")] public DateTimeOffset Date { get; set; }
+
+        [JsonProperty("reason")] public string Reason { get; set; }
+    }
 }

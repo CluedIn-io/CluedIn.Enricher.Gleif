@@ -1,12 +1,12 @@
 using Newtonsoft.Json;
 
-namespace CluedIn.ExternalSearch.Providers.Gleif.Models;
-
-public class LegalForm
+namespace CluedIn.ExternalSearch.Providers.Gleif.Models
 {
-    [JsonProperty("id")]
-    public string Id { get; set; }
 
-    [JsonProperty("other")]
-    public object Other { get; set; }
+    public class LegalForm
+    {
+        [JsonProperty("id")] public string Id { get; set; }
+
+        [JsonProperty("other")] public string Other { get; set; }
+    }
 }
