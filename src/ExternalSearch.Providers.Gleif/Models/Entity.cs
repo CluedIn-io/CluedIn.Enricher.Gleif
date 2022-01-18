@@ -1,52 +1,52 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace CluedIn.ExternalSearch.Providers.Gleif.Models
+namespace CluedIn.ExternalSearch.Providers.Gleif.Models;
+
+public class Entity
 {
-    //public class Entity
-    //{
-    //    [JsonProperty("LegalName")]
-    //    public DataValue LegalName { get; set; }
+    [JsonProperty("legalName")]
+    public LegalName LegalName { get; set; }
 
-    //    [JsonProperty("OtherEntityNames")]
-    //    public OtherEntityName OtherEntityNames { get; set; }
+    [JsonProperty("otherNames")]
+    public List<OtherName> OtherNames { get; set; }
 
-    //    [JsonProperty("TransliteratedOtherEntityNames")]
-    //    public TransliteratedOtherEntityName TransliteratedOtherEntityNames { get; set; }
+    [JsonProperty("transliteratedOtherNames")]
+    public List<object> TransliteratedOtherNames { get; set; }
 
-    //    [JsonProperty("LegalAddress")]
-    //    public Address LegalAddress { get; set; }
+    [JsonProperty("legalAddress")]
+    public Address LegalAddress { get; set; }
 
-    //    [JsonProperty("HeadquartersAddress")]
-    //    public Address HeadquartersAddress { get; set; }
+    [JsonProperty("headquartersAddress")]
+    public Address HeadquartersAddress { get; set; }
 
-    //    [JsonProperty("TransliteratedOtherAddresses")]
-    //    public TransliteratedOtherAddress TransliteratedOtherAddresses { get; set; }
+    [JsonProperty("registeredAt")]
+    public RegisteredAt RegisteredAt { get; set; }
 
-    //    [JsonProperty("OtherAddresses")]
-    //    public OtherAddress OtherAddresses { get; set; }
+    [JsonProperty("registeredAs")]
+    public string RegisteredAs { get; set; }
 
-    //    [JsonProperty("RegistrationAuthority")]
-    //    public RegistrationAuthority RegistrationAuthority { get; set; }
+    [JsonProperty("jurisdiction")]
+    public string Jurisdiction { get; set; }
 
-    //    [JsonProperty("LegalJurisdiction")]
-    //    public DataValue LegalJurisdiction { get; set; }
+    [JsonProperty("category")]
+    public string Category { get; set; }
 
-    //    [JsonProperty("LegalForm")]
-    //    public LegalForm LegalForm { get; set; }
+    [JsonProperty("legalForm")]
+    public LegalForm LegalForm { get; set; }
 
-    //    [JsonProperty("EntityStatus")]
-    //    public DataValue EntityStatus { get; set; }
+    [JsonProperty("associatedEntity")]
+    public AssociatedEntity AssociatedEntity { get; set; }
 
-    //    [JsonProperty("EntityCategory")]
-    //    public DataValue EntityCategory { get; set; }
+    [JsonProperty("status")]
+    public string Status { get; set; }
 
-    //    // EntityCategorySpecified
-    //    // AssociatedEntity       
-    //    // EntityExpirationDate
-    //    // EntityExpirationDateSpecified
-    //    // EntityExpirationReason
-    //    // EntityExpirationReasonSpecified
-    //    // SuccessorEntity
-    //    // NextVersion
-    //}
+    [JsonProperty("expiration")]
+    public Expiration Expiration { get; set; }
+
+    [JsonProperty("successorEntity")]
+    public SuccessorEntity SuccessorEntity { get; set; }
+
+    [JsonProperty("otherAddresses")]
+    public List<object> OtherAddresses { get; set; }
 }

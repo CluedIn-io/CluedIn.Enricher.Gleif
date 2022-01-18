@@ -1,35 +1,34 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace CluedIn.ExternalSearch.Providers.Gleif.Models
+namespace CluedIn.ExternalSearch.Providers.Gleif.Models;
+
+public class Address
 {
-    //public class Address
-    //{
-    //    [JsonProperty("FirstAddressLine")]
-    //    public DataValue FirstAddressLine { get; set; }
+    [JsonProperty("language")]
+    public string Language { get; set; }
 
-    //    [JsonProperty("AddressNumber")]
-    //    public DataValue AddressNumber { get; set; }
+    [JsonProperty("addressLines")]
+    public List<string> AddressLines { get; set; }
 
-    //    [JsonProperty("AddressNumberWithinBuilding")]
-    //    public DataValue AddressNumberWithinBuilding { get; set; }
+    [JsonProperty("addressNumber")]
+    public string AddressNumber { get; set; }
 
-    //    [JsonProperty("MailRouting")]
-    //    public DataValue MailRouting { get; set; }
+    [JsonProperty("addressNumberWithinBuilding")]
+    public string AddressNumberWithinBuilding { get; set; }
 
-    //    [JsonProperty("AdditionalAddressLine")]
-    //    public List<DataValue> AdditionalAddressLine { get; set; }
+    [JsonProperty("mailRouting")]
+    public string MailRouting { get; set; }
 
-    //    [JsonProperty("Region")]
-    //    public DataValue Region { get; set; }
+    [JsonProperty("city")]
+    public string City { get; set; }
 
-    //    [JsonProperty("City")]
-    //    public DataValue City { get; set; }
+    [JsonProperty("region")]
+    public string Region { get; set; }
 
-    //    [JsonProperty("Country")]
-    //    public DataValue Country { get; set; }
+    [JsonProperty("country")]
+    public string Country { get; set; }
 
-    //    [JsonProperty("PostalCode")]
-    //    public DataValue PostalCode { get; set; }
-    //}
+    [JsonProperty("postalCode")]
+    public string PostalCode { get; set; }
 }
