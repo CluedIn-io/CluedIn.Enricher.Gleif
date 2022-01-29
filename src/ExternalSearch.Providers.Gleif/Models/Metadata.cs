@@ -16,7 +16,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif.Models
     public class GoldenCopy
     {
         [JsonProperty("publishDate")]
-        public DateTimeOffset PublishDate { get; set; }
+        public DateTimeOffset? PublishDate { get; set; }
     }
 
     public class Pagination
