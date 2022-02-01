@@ -164,6 +164,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             metadata.OriginEntityCode = code;
 
             metadata.Codes.Add(code);
+            metadata.Codes.Add(new EntityCode(EntityType.Organization, Constants.ProviderName, data.Attributes.Lei));
 
             if (data.Attributes.Entity.OtherNames != null)
                 metadata.Aliases.AddRange(data.Attributes.Entity?.OtherNames.Select(v => v.Name));
