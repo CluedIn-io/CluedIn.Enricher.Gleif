@@ -66,12 +66,6 @@ namespace CluedIn.ExternalSearch.Providers.Gleif.Vocabularies
                 this.EntityCategory                             = group.Add(new VocabularyKey("entityCategory"));
             });
 
-            this.AddMapping(this.LeiCode,                       CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesLeiCode);
-            this.AddMapping(this.LegalName,                     CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName);
-            this.AddMapping(this.LegalAddress.Address,          CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.Address);
-            this.AddMapping(this.LegalAddress.City,             CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCity);
-            this.AddMapping(this.LegalAddress.PostalCode,       CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressZipCode);
-            this.AddMapping(this.LegalAddress.CountryCode,      CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.AddressCountryCode);
         }
 
         public VocabularyKey LeiCode { get; internal set; }
