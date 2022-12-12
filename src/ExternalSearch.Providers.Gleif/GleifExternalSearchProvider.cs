@@ -100,7 +100,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         {
             var resultItem = result.As<GleifResponse>();
 
-            var code = this.GetOriginEntityCode(resultItem.Data.Data.First()?.Attributes.Lei);
+            var code = this.GetOriginEntityCode(resultItem.Data.Data.First()?.Attributes.Lei, request);
 
             var clue = new Clue(code, context.Organization);
 
@@ -138,9 +138,9 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         /// <param name="resultItem">The result item.</param>
         /// <param name="lei"></param>
         /// <returns>The origin entity code.</returns>
-        private EntityCode GetOriginEntityCode(string lei)
+        private EntityCode GetOriginEntityCode(string lei, IExternalSearchRequest request)
         {
-            return new EntityCode(EntityType.Organization, this.GetCodeOrigin(), lei);
+            return new EntityCode(request.EntityMetaData.EntityType, this.GetCodeOrigin(), request.EntityMetaData.OriginEntityCode.Value);
         }
 
         /// <summary>Gets the code origin.</summary>
@@ -157,14 +157,13 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         {
             var data = resultItem.Data.Data.First();
 
-            var code = this.GetOriginEntityCode(data.Attributes.Lei);
+            var code = this.GetOriginEntityCode(data.Attributes.Lei, request);
 
-            metadata.EntityType       = EntityType.Organization;
+            metadata.EntityType       = request.EntityMetaData.EntityType;
             metadata.Name = request.EntityMetaData.Name; //data.Attributes.Entity.LegalName?.Name;
             metadata.OriginEntityCode = code;
 
             metadata.Codes.Add(code);
-            metadata.Codes.Add(new EntityCode(EntityType.Organization, Constants.ProviderName, data.Attributes.Lei));
 
             if (data.Attributes.Entity.OtherNames != null)
                 metadata.Aliases.AddRange(data.Attributes.Entity?.OtherNames.Select(v => v.Name));
