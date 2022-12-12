@@ -45,14 +45,37 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
          * METHODS
          **********************************************************************************************************/
 
-        /// <inheritdoc/>
         public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request)
         {
-            if (!this.Accepts(request.EntityMetaData.EntityType))
+            foreach (var externalSearchQuery in InternalBuildQueries(context, request))
+            {
+                yield return externalSearchQuery;
+            }
+        }
+        private IEnumerable<IExternalSearchQuery> InternalBuildQueries(ExecutionContext context, IExternalSearchRequest request, IDictionary<string, object> config = null)
+        {
+            if (config.TryGetValue(Constants.KeyName.AcceptedEntityType, out var customType) && !string.IsNullOrWhiteSpace(customType?.ToString()))
+            {
+                if (!request.EntityMetaData.EntityType.Is(customType.ToString()))
+                {
+                    yield break;
+                }
+            }
+            else if (!this.Accepts(request.EntityMetaData.EntityType))
                 yield break;
 
             var entityType       = request.EntityMetaData.EntityType;
-            var leiCodes         = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesLeiCode, new HashSet<string>());
+
+            var leiCodes = new HashSet<string>();
+            if (config.TryGetValue(Constants.KeyName.LeiCodeKey, out var customVocabKeyLei) && !string.IsNullOrWhiteSpace(customVocabKeyLei?.ToString()))
+            {
+                leiCodes = request.QueryParameters.GetValue<string, HashSet<string>>(config[Constants.KeyName.LeiCodeKey].ToString(), new HashSet<string>());
+            }
+            else
+            {
+                leiCodes = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesLeiCode, new HashSet<string>()).ToHashSetEx();
+            }
+
 
             if (leiCodes != null && leiCodes.Any())
             {
@@ -260,7 +283,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 
         public IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
-            return BuildQueries(context, request);
+            return InternalBuildQueries(context, request, config);
         }
 
         public IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query, IDictionary<string, object> config, IProvider provider)

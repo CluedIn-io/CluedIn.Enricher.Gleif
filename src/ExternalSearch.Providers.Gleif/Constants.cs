@@ -11,6 +11,12 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public const string ProviderName = "Gleif";
         public static readonly Guid ProviderId = Guid.Parse("6d47d335-2bf3-4249-88c4-0f08d322c24c");
 
+        public struct KeyName
+        {
+            public const string AcceptedEntityType = "acceptedEntityType";
+            public const string LeiCodeKey = "leiCodeKey";
+        }
+
         public static string About { get; set; } = "Gleif is an enricher which provides information using the Legal Entity Identifier (LEI) of an organization";
         public static string Icon { get; set; } = "Resources.gleif.png";
         public static string Domain { get; set; } = "https://www.gleif.org/en";
@@ -18,6 +24,22 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
             token = new List<Control>()
+            {
+                new Control()
+                {
+                    displayName = "Accepted Entity Type",
+                    type = "input",
+                    isRequired = false,
+                    name = KeyName.AcceptedEntityType
+                },
+                new Control()
+                {
+                    displayName = "Lei Code vocab key",
+                    type = "input",
+                    isRequired = false,
+                    name = KeyName.LeiCodeKey
+                }
+            }
         };
 
         public static IEnumerable<Control> Properties { get; set; } = new List<Control>()
