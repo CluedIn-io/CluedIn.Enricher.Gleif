@@ -103,6 +103,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             var code = this.GetOriginEntityCode(resultItem.Data.Data.First()?.Attributes.Lei);
 
             var clue = new Clue(code, context.Organization);
+            clue.Data.EntityData.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             this.PopulateMetadata(clue.Data.EntityData, resultItem, request);
 
