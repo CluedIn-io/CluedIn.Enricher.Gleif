@@ -33,6 +33,13 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                     isRequired = false,
                     name = nameof(GleifExternalSearchJobData.LeiVocabularyKey)
                 },
+                new()
+                {
+                    displayName = "Skip Entity Code Creation (Lei Code)",
+                    type = "checkbox",
+                    isRequired = false,
+                    name =  nameof(GleifExternalSearchJobData.SkipEntityCodeCreation),
+                }
             }
         };
 
