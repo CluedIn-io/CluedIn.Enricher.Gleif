@@ -18,6 +18,29 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
             token = new List<Control>()
+            {
+                new()
+                {
+                    displayName = "Accepted Entity Type",
+                    type = "input",
+                    isRequired = true,
+                    name = nameof(GleifExternalSearchJobData.AcceptedEntityType)
+                },
+                new()
+                {
+                    displayName = "Lei Code Vocabulary Key",
+                    type = "input",
+                    isRequired = false,
+                    name = nameof(GleifExternalSearchJobData.LeiVocabularyKey)
+                },
+                new()
+                {
+                    displayName = "Skip Entity Code Creation (Lei Code)",
+                    type = "checkbox",
+                    isRequired = false,
+                    name =  nameof(GleifExternalSearchJobData.SkipEntityCodeCreation),
+                }
+            }
         };
 
         public static IEnumerable<Control> Properties { get; set; } = new List<Control>()
