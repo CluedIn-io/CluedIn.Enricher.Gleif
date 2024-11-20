@@ -17,28 +17,31 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
-            token = new List<Control>()
+            Token = new List<Control>()
             {
                 new()
                 {
-                    displayName = "Accepted Entity Type",
-                    type = "input",
-                    isRequired = true,
-                    name = nameof(GleifExternalSearchJobData.AcceptedEntityType)
+                    DisplayName = "Accepted Entity Type",
+                    Type = "input",
+                    IsRequired = true,
+                    Name = nameof(GleifExternalSearchJobData.AcceptedEntityType),
+                    Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new()
                 {
-                    displayName = "Lei Code Vocabulary Key",
-                    type = "input",
-                    isRequired = false,
-                    name = nameof(GleifExternalSearchJobData.LeiVocabularyKey)
+                    DisplayName = "Lei Code Vocabulary Key",
+                    Type = "input",
+                    IsRequired = false,
+                    Name = nameof(GleifExternalSearchJobData.LeiVocabularyKey),
+                    Help = "The vocabulary key that contains the LEI codes of companies you want to enrich (e.g., organization.leicodes)."
                 },
                 new()
                 {
-                    displayName = "Skip Entity Code Creation (Lei Code)",
-                    type = "checkbox",
-                    isRequired = false,
-                    name =  nameof(GleifExternalSearchJobData.SkipEntityCodeCreation),
+                    DisplayName = "Skip Entity Code Creation (LEI Code)",
+                    Type = "checkbox",
+                    IsRequired = false,
+                    Name =  nameof(GleifExternalSearchJobData.SkipEntityCodeCreation),
+                    Help = "Toggle to control the creation of new entity codes using the LEI code."
                 }
             }
         };
