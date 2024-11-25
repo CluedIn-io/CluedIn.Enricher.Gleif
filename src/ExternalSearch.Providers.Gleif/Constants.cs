@@ -7,6 +7,13 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 {
     public static class Constants
     {
+        public struct KeyName
+        {
+            public const string AcceptedEntityType = "acceptedEntityType";
+            public const string LeiVocabularyKey = "leiVocabularyKey";
+            public const string SkipEntityCodeCreation = "skipEntityCodeCreation";
+        }
+
         public const string ComponentName = "Gleif";
         public const string ProviderName = "Gleif";
         public static readonly Guid ProviderId = Guid.Parse("6d47d335-2bf3-4249-88c4-0f08d322c24c");
@@ -46,17 +53,17 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                 new()
                 {
                     DisplayName = "Accepted Entity Type",
-                    Type = "input",
+                    Type = "entityTypeSelector",
                     IsRequired = true,
-                    Name = nameof(GleifExternalSearchJobData.AcceptedEntityType),
+                    Name = KeyName.AcceptedEntityType,
                     Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new()
                 {
                     DisplayName = "Lei Code Vocabulary Key",
-                    Type = "input",
+                    Type = "vocabularyKeySelector",
                     IsRequired = false,
-                    Name = nameof(GleifExternalSearchJobData.LeiVocabularyKey),
+                    Name = KeyName.LeiVocabularyKey,
                     Help = "The vocabulary key that contains the LEI codes of companies you want to enrich (e.g., organization.leicodes)."
                 },
                 new()
@@ -64,7 +71,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                     DisplayName = "Skip Entity Code Creation (LEI Code)",
                     Type = "checkbox",
                     IsRequired = false,
-                    Name =  nameof(GleifExternalSearchJobData.SkipEntityCodeCreation),
+                    Name =  KeyName.SkipEntityCodeCreation,
                     Help = "Toggle to control the creation of new entity codes using the LEI code."
                 }
             }
