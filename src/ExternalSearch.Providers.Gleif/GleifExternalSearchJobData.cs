@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CluedIn.Core.Crawling;
+using static CluedIn.ExternalSearch.Providers.Gleif.Constants;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif
 {
@@ -7,17 +8,17 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
     {
         public GleifExternalSearchJobData(IDictionary<string, object> configuration)
         {
-            AcceptedEntityType = GetValue(configuration, nameof(AcceptedEntityType), default(string));
-            LeiVocabularyKey = GetValue(configuration, nameof(LeiVocabularyKey), default(string));
-            SkipEntityCodeCreation = GetValue(configuration, nameof(SkipEntityCodeCreation), default(bool));
+            AcceptedEntityType = GetValue(configuration, KeyName.AcceptedEntityType, default(string));
+            LeiVocabularyKey = GetValue(configuration, KeyName.LeiVocabularyKey, default(string));
+            SkipEntityCodeCreation = GetValue(configuration, KeyName.SkipEntityCodeCreation, default(bool));
         }
 
         public IDictionary<string, object> ToDictionary()
         {
             return new Dictionary<string, object> {
-                { nameof(AcceptedEntityType), AcceptedEntityType },
-                { nameof(LeiVocabularyKey), LeiVocabularyKey },
-                { nameof(SkipEntityCodeCreation), SkipEntityCodeCreation },
+                { KeyName.AcceptedEntityType, AcceptedEntityType },
+                { KeyName.LeiVocabularyKey, LeiVocabularyKey },
+                { KeyName.SkipEntityCodeCreation, SkipEntityCodeCreation },
             };
         }
 
