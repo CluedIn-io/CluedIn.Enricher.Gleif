@@ -17,20 +17,21 @@ using CluedIn.Core.Data;
 using CluedIn.Core.Data.Parts;
 using CluedIn.Core.Data.Relational;
 using CluedIn.Core.ExternalSearch;
+using CluedIn.Core.Connectors;
 using CluedIn.Core.Providers;
+using CluedIn.ExternalSearch.Provider;
 using CluedIn.ExternalSearch.Providers.Gleif.Models;
 using CluedIn.ExternalSearch.Providers.Gleif.Vocabularies;
 using RestSharp;
 using Newtonsoft.Json;
 using EntityType = CluedIn.Core.Data.EntityType;
-using CluedIn.ExternalSearch.Provider;
-using Nest;
+using System.Text.RegularExpressions;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif
 {
     /// <summary>The gleif graph external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
-    public class GleifExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider
+    public class GleifExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider, IExternalSearchProviderWithVerifyConnection
     {
         private static readonly EntityType[] DefaultAcceptedEntityTypes = { EntityType.Organization };
 
@@ -156,6 +157,40 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             return null;
+        }
+
+        public ConnectionVerificationResult VerifyConnection(ExecutionContext context, IReadOnlyDictionary<string, object> config)
+        {
+            var client = new RestClient("https://api.gleif.org/api/v1/lei-records");
+            var request = new RestRequest("?page[size]=1&page[number]=1&filter[lei]=7ZW8QJWVPR4P1J1KQY45", Method.GET);
+
+            var response = client.ExecuteAsync(request).Result;
+
+            return ConstructVerifyConnectionResponse(response);
+        }
+
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        {
+            var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
+            if (response.ErrorException != null)
+            {
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} {(!string.IsNullOrWhiteSpace(response.ErrorException.Message) ? response.ErrorException.Message : "This could be due to breaking changes in the external system")}.");
+            }
+
+            if (response.StatusCode is HttpStatusCode.Unauthorized)
+            {
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} This could be due to invalid API key.");
+            }
+
+            var regex = new Regex(@"\<(html|head|body|div|span|img|p\>|a href)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+            var isHtml = regex.IsMatch(response.Content);
+
+            var errorMessage = response.IsSuccessful ? string.Empty
+                : string.IsNullOrWhiteSpace(response.Content) || isHtml
+                    ? $"{errorMessageBase} This could be due to breaking changes in the external system."
+                    : $"{errorMessageBase} {response.Content}.";
+
+            return new ConnectionVerificationResult(response.IsSuccessful, errorMessage);
         }
 
         /// <summary>Creates the metadata.</summary>
