@@ -26,7 +26,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                     "type": "list-item",
                     "children": [
                       {
-                        "text": "Add the entity type to specify the golden records you want to enrich. Only golden records belonging to that entity type will be enriched."
+                        "text": "Add the business domain to specify the golden records you want to enrich. Only golden records belonging to that business domain will be enriched."
                       }
                     ]
                   },
@@ -52,11 +52,11 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             {
                 new()
                 {
-                    DisplayName = "Accepted Entity Type",
+                    DisplayName = "Accepted Business Domain",
                     Type = "entityTypeSelector",
                     IsRequired = true,
                     Name = KeyName.AcceptedEntityType,
-                    Help = "The entity type that defines the golden records you want to enrich (e.g., /Organization)."
+                    Help = "The business domain that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new()
                 {
