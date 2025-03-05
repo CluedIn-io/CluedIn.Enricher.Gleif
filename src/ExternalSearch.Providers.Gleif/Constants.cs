@@ -17,7 +17,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public const string ComponentName = "Gleif";
         public const string ProviderName = "Gleif";
         public static readonly Guid ProviderId = Guid.Parse("6d47d335-2bf3-4249-88c4-0f08d322c24c");
-        public const string Instruction = """
+        public static readonly string Instruction = $$"""
             [
               {
                 "type": "bulleted-list",
@@ -26,7 +26,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                     "type": "list-item",
                     "children": [
                       {
-                        "text": "Add the business domain to specify the golden records you want to enrich. Only golden records belonging to that business domain will be enriched."
+                        "text": "Add the {{EntityTypeLabel.ToLower()}} to specify the golden records you want to enrich. Only golden records belonging to that {{EntityTypeLabel.ToLower()}} will be enriched."
                       }
                     ]
                   },
@@ -46,17 +46,22 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public static string Icon { get; set; } = "Resources.gleif.png";
         public static string Domain { get; set; } = "https://www.gleif.org/en";
 
+        private static Version _cluedInVersion;
+        public static Version CluedInVersion => _cluedInVersion ??= typeof(Core.Constants).Assembly.GetName().Version;
+        public static string EntityTypeLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Type" : "Business Domain";
+        public static string EntityCodeLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Code" : "Identifier";
+        public static string EntityCodesLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Codes" : "Identifiers";
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
             Token = new List<Control>()
             {
                 new()
                 {
-                    DisplayName = "Accepted Business Domain",
+                    DisplayName = $"Accepted {EntityTypeLabel}",
                     Type = "entityTypeSelector",
                     IsRequired = true,
                     Name = KeyName.AcceptedEntityType,
-                    Help = "The business domain that defines the golden records you want to enrich (e.g., /Organization)."
+                    Help = $"The {EntityTypeLabel.ToLower()} that defines the golden records you want to enrich (e.g., /Organization)."
                 },
                 new()
                 {
@@ -68,11 +73,11 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                 },
                 new()
                 {
-                    DisplayName = "Skip Entity Code Creation (LEI Code)",
+                    DisplayName = $"Skip {EntityCodeLabel} Creation (LEI Code)",
                     Type = "checkbox",
                     IsRequired = false,
                     Name =  KeyName.SkipEntityCodeCreation,
-                    Help = "Toggle to control the creation of new entity codes using the LEI code."
+                    Help = $"Toggle to control the creation of new {EntityCodesLabel.ToLower()} using the LEI code."
                 }
             }
         };
