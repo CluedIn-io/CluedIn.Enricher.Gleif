@@ -49,8 +49,8 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         private static Version _cluedInVersion;
         public static Version CluedInVersion => _cluedInVersion ??= typeof(Core.Constants).Assembly.GetName().Version;
         public static string EntityTypeLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Type" : "Business Domain";
-        public static string EntityCodeLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Code" : "Identifier";
-        public static string EntityCodesLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Codes" : "Identifiers";
+        public static string EntityCodeLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Code" : "Entity Identifier";
+        public static string EntityCodesLabel => CluedInVersion < new Version(4, 5, 0) ? "Entity Codes" : "Entity Identifiers";
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
             Token = new List<Control>()
@@ -73,11 +73,11 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                 },
                 new()
                 {
-                    DisplayName = $"Skip Entity {EntityCodeLabel} Creation (LEI Code)",
+                    DisplayName = $"Skip {EntityCodeLabel} Creation (LEI Code)",
                     Type = "checkbox",
                     IsRequired = false,
                     Name =  KeyName.SkipEntityCodeCreation,
-                    Help = $"Toggle to control the creation of new entity {EntityCodesLabel.ToLower()} using the LEI code."
+                    Help = $"Toggle to control the creation of new {EntityCodesLabel.ToLower()} using the LEI code."
                 }
             }
         };
