@@ -73,11 +73,11 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                 },
                 new()
                 {
-                    DisplayName = $"Skip {EntityCodeLabel} Creation (LEI Code)",
+                    DisplayName = $"Skip Entity {EntityCodeLabel} Creation (LEI Code)",
                     Type = "checkbox",
                     IsRequired = false,
                     Name =  KeyName.SkipEntityCodeCreation,
-                    Help = $"Toggle to control the creation of new {EntityCodesLabel.ToLower()} using the LEI code."
+                    Help = $"Toggle to control the creation of new entity {EntityCodesLabel.ToLower()} using the LEI code."
                 }
             }
         };
