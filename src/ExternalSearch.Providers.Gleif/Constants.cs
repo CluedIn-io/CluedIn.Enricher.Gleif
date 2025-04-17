@@ -11,7 +11,6 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         {
             public const string AcceptedEntityType = "acceptedEntityType";
             public const string LeiVocabularyKey = "leiVocabularyKey";
-            public const string SkipEntityCodeCreation = "skipEntityCodeCreation";
         }
 
         public const string ComponentName = "Gleif";
@@ -71,14 +70,6 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                     Name = KeyName.LeiVocabularyKey,
                     Help = "The vocabulary key that contains the LEI codes of companies you want to enrich (e.g., organization.leicodes)."
                 },
-                new()
-                {
-                    DisplayName = $"Skip {EntityCodeLabel} Creation (LEI Code)",
-                    Type = "checkbox",
-                    IsRequired = false,
-                    Name =  KeyName.SkipEntityCodeCreation,
-                    Help = $"Toggle to control the creation of new {EntityCodesLabel.ToLower()} using the LEI code."
-                }
             }
         };
 
