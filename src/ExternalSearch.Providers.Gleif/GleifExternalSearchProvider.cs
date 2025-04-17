@@ -129,10 +129,10 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<GleifResponse>();
+            var code = new EntityCode(request.EntityMetaData.EntityType, "gleif", resultItem.Data.Data.First()?.Attributes.Lei);
+            var clue = new Clue(code, context.Organization);
 
-            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization);
-
-            PopulateMetadata(clue.Data.EntityData, resultItem, request, config);
+            PopulateMetadata(clue.Data.EntityData, resultItem, request);
 
             return new[] { clue };
         }
@@ -141,7 +141,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<GleifResponse>();
-            return CreateMetadata(resultItem, request, config);
+            return CreateMetadata(resultItem, request);
         }
 
         /// <inheritdoc/>
@@ -196,11 +196,11 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         /// <summary>Creates the metadata.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The metadata.</returns>
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request)
         {
             var metadata = new EntityMetadataPart();
 
-            PopulateMetadata(metadata, resultItem, request, config);
+            PopulateMetadata(metadata, resultItem, request);
 
             return metadata;
         }
@@ -224,21 +224,15 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultItem">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private void PopulateMetadata(IEntityMetadata metadata, IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request)
         {
             var data = resultItem.Data.Data.First();
-
-            var jobData = new GleifExternalSearchJobData(config);
-            var code = request.EntityMetaData.OriginEntityCode;
+            var code = new EntityCode(request.EntityMetaData.EntityType, "gleif", data.Attributes.Lei);
 
             metadata.EntityType       = request.EntityMetaData.EntityType;
             metadata.Name = request.EntityMetaData.Name; //data.Attributes.Entity.LegalName?.Name;
             metadata.OriginEntityCode = code;
-
-            if (!jobData.SkipEntityCodeCreation)
-            {
-                metadata.Codes.Add(GetOriginEntityCode(data.Attributes.Lei, request));
-            }
+            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             if (data.Attributes.Entity.OtherNames != null)
                 metadata.Aliases.AddRange(data.Attributes.Entity?.OtherNames.Select(v => v.Name));
