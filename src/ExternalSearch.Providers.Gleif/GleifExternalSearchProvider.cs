@@ -17,20 +17,21 @@ using CluedIn.Core.Data;
 using CluedIn.Core.Data.Parts;
 using CluedIn.Core.Data.Relational;
 using CluedIn.Core.ExternalSearch;
+using CluedIn.Core.Connectors;
 using CluedIn.Core.Providers;
+using CluedIn.ExternalSearch.Provider;
 using CluedIn.ExternalSearch.Providers.Gleif.Models;
 using CluedIn.ExternalSearch.Providers.Gleif.Vocabularies;
 using RestSharp;
 using Newtonsoft.Json;
 using EntityType = CluedIn.Core.Data.EntityType;
-using CluedIn.ExternalSearch.Provider;
-using Nest;
+using System.Text.RegularExpressions;
 
 namespace CluedIn.ExternalSearch.Providers.Gleif
 {
     /// <summary>The gleif graph external search provider.</summary>
     /// <seealso cref="CluedIn.ExternalSearch.ExternalSearchProviderBase" />
-    public class GleifExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider
+    public class GleifExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider, IExternalSearchProviderWithVerifyConnection
     {
         private static readonly EntityType[] DefaultAcceptedEntityTypes = { EntityType.Organization };
 
@@ -128,10 +129,10 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<GleifResponse>();
+            var code = new EntityCode(request.EntityMetaData.EntityType, "gleif", resultItem.Data.Data.First()?.Attributes.Lei);
+            var clue = new Clue(code, context.Organization);
 
-            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization);
-
-            PopulateMetadata(clue.Data.EntityData, resultItem, request, config);
+            PopulateMetadata(clue.Data.EntityData, resultItem, request);
 
             return new[] { clue };
         }
@@ -140,7 +141,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<GleifResponse>();
-            return CreateMetadata(resultItem, request, config);
+            return CreateMetadata(resultItem, request);
         }
 
         /// <inheritdoc/>
@@ -158,14 +159,48 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             return null;
         }
 
+        public ConnectionVerificationResult VerifyConnection(ExecutionContext context, IReadOnlyDictionary<string, object> config)
+        {
+            var client = new RestClient("https://api.gleif.org/api/v1/lei-records");
+            var request = new RestRequest("?page[size]=1&page[number]=1&filter[lei]=7ZW8QJWVPR4P1J1KQY45", Method.GET);
+
+            var response = client.ExecuteAsync(request).Result;
+
+            return ConstructVerifyConnectionResponse(response);
+        }
+
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        {
+            var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
+            if (response.ErrorException != null)
+            {
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} {(!string.IsNullOrWhiteSpace(response.ErrorException.Message) ? response.ErrorException.Message : "This could be due to breaking changes in the external system")}.");
+            }
+
+            if (response.StatusCode is HttpStatusCode.Unauthorized)
+            {
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} This could be due to invalid API key.");
+            }
+
+            var regex = new Regex(@"\<(html|head|body|div|span|img|p\>|a href)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+            var isHtml = regex.IsMatch(response.Content);
+
+            var errorMessage = response.IsSuccessful ? string.Empty
+                : string.IsNullOrWhiteSpace(response.Content) || isHtml
+                    ? $"{errorMessageBase} This could be due to breaking changes in the external system."
+                    : $"{errorMessageBase} {response.Content}.";
+
+            return new ConnectionVerificationResult(response.IsSuccessful, errorMessage);
+        }
+
         /// <summary>Creates the metadata.</summary>
         /// <param name="resultItem">The result item.</param>
         /// <returns>The metadata.</returns>
-        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private IEntityMetadata CreateMetadata(IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request)
         {
             var metadata = new EntityMetadataPart();
 
-            PopulateMetadata(metadata, resultItem, request, config);
+            PopulateMetadata(metadata, resultItem, request);
 
             return metadata;
         }
@@ -189,21 +224,15 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         /// <summary>Populates the metadata.</summary>
         /// <param name="metadata">The metadata.</param>
         /// <param name="resultItem">The result item.</param>
-        private void PopulateMetadata(IEntityMetadata metadata, IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private void PopulateMetadata(IEntityMetadata metadata, IExternalSearchQueryResult<GleifResponse> resultItem, IExternalSearchRequest request)
         {
             var data = resultItem.Data.Data.First();
-
-            var jobData = new GleifExternalSearchJobData(config);
-            var code = request.EntityMetaData.OriginEntityCode;
+            var code = new EntityCode(request.EntityMetaData.EntityType, "gleif", data.Attributes.Lei);
 
             metadata.EntityType       = request.EntityMetaData.EntityType;
             metadata.Name = request.EntityMetaData.Name; //data.Attributes.Entity.LegalName?.Name;
             metadata.OriginEntityCode = code;
-
-            if (!jobData.SkipEntityCodeCreation)
-            {
-                metadata.Codes.Add(GetOriginEntityCode(data.Attributes.Lei, request));
-            }
+            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             if (data.Attributes.Entity.OtherNames != null)
                 metadata.Aliases.AddRange(data.Attributes.Entity?.OtherNames.Select(v => v.Name));
