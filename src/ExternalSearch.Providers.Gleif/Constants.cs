@@ -66,7 +66,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
                 {
                     DisplayName = "Lei Code Vocabulary Key",
                     Type = "vocabularyKeySelector",
-                    IsRequired = false,
+                    IsRequired = true,
                     Name = KeyName.LeiVocabularyKey,
                     Help = "The vocabulary key that contains the LEI codes of companies you want to enrich (e.g., organization.leicodes)."
                 },
