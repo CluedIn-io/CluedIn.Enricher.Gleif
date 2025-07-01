@@ -10,7 +10,6 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         {
             AcceptedEntityType = GetValue(configuration, KeyName.AcceptedEntityType, default(string));
             LeiVocabularyKey = GetValue(configuration, KeyName.LeiVocabularyKey, default(string));
-            SkipEntityCodeCreation = GetValue(configuration, KeyName.SkipEntityCodeCreation, default(bool));
         }
 
         public IDictionary<string, object> ToDictionary()
@@ -18,12 +17,10 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             return new Dictionary<string, object> {
                 { KeyName.AcceptedEntityType, AcceptedEntityType },
                 { KeyName.LeiVocabularyKey, LeiVocabularyKey },
-                { KeyName.SkipEntityCodeCreation, SkipEntityCodeCreation },
             };
         }
 
         public string AcceptedEntityType { get; set; }
         public string LeiVocabularyKey { get; set; }
-        public bool SkipEntityCodeCreation { get; set; }
     }
 }
