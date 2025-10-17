@@ -98,7 +98,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 
             if (!validLEICodes.Any())
             {
-                throw new Exception($"Unable to generate queries for {entityName}. Legal Entity Identifier (LEI) was identified as invalid code.");
+                throw new Exception($"Unable to generate queries for {entityName}. Legal Entity Identifier (LEI) is invalid and has been filtered out.");
             }
 
             foreach (var value in validLEICodes)
