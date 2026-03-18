@@ -74,7 +74,9 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             if (!Accepts(config, request.EntityMetaData.EntityType))
+            {
                 yield break;
+            }
 
             var entityType       = request.EntityMetaData.EntityType;
             var leiCodes         = request.QueryParameters.GetValue(Core.Data.Vocabularies.Vocabularies.CluedInOrganization.CodesLeiCode, new HashSet<string>());
@@ -82,15 +84,25 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             var gleifExternalSearchJobData = new GleifExternalSearchJobData(config);
 
             if (!string.IsNullOrWhiteSpace(gleifExternalSearchJobData.LeiVocabularyKey))
-                leiCodes = request.QueryParameters.GetValue<string, HashSet<string>>(gleifExternalSearchJobData.LeiVocabularyKey, new HashSet<string>());
-
-            if (leiCodes != null && leiCodes.Any())
             {
-                var validLEICodes = leiCodes.Where(LEICode.IsValidCode);
-
-                foreach (var value in validLEICodes)
-                    yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Identifier, value);
+                leiCodes = request.QueryParameters.GetValue<string, HashSet<string>>(gleifExternalSearchJobData.LeiVocabularyKey, new HashSet<string>());
             }
+
+            var entityName = !string.IsNullOrEmpty(request.EntityMetaData.Name) ? request.EntityMetaData.Name : request.EntityMetaData.DisplayName;
+            if (!leiCodes.Any())
+            {
+                throw new Exception($"Unable to generate queries for {entityName}. Legal Entity Identifier (LEI) is empty.");
+            }
+
+            var validLEICodes = leiCodes.Where(LEICode.IsValidCode).ToList();
+
+            if (!validLEICodes.Any())
+            {
+                throw new Exception($"Unable to generate queries for {entityName}. Legal Entity Identifier (LEI) is invalid and has been filtered out.");
+            }
+
+            foreach (var value in validLEICodes)
+                yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Identifier, value);
         }
 
         /// <inheritdoc/>
@@ -99,7 +111,9 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
             var leiCode = query.QueryParameters[ExternalSearchQueryParameter.Identifier].FirstOrDefault();
 
             if (string.IsNullOrEmpty(leiCode))
+            {
                 yield break;
+            }
 
             var client = new RestClient("https://api.gleif.org/api/v1/lei-records");
 
@@ -107,22 +121,32 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 
             var response = client.ExecuteAsync(request).Result;
 
-            if (response.StatusCode == HttpStatusCode.OK)
+            switch (response.StatusCode)
             {
-                // HACK: Removes the outer array from json string
-                var responseData = response.Content; //.Substring(1, response.Content.Length - 2);
+                case HttpStatusCode.OK:
+                {
+                    // HACK: Removes the outer array from json string
+                    var responseData = response.Content; //.Substring(1, response.Content.Length - 2);
 
-                var data = JsonConvert.DeserializeObject<GleifResponse>(responseData);
+                    var data = JsonConvert.DeserializeObject<GleifResponse>(responseData);
 
-                if (data?.Data != null && data.Data.Any())
-                    yield return new ExternalSearchQueryResult<GleifResponse>(query, data);
+                    if (data?.Data != null && data.Data.Any())
+                    {
+                        yield return new ExternalSearchQueryResult<GleifResponse>(query, data);
+                    }
+
+                    break;
+                }
+                default:
+                {
+                    if (response.ErrorException != null)
+                    {
+                        throw new AggregateException($"Could not execute external search query - ErrorMessage: {response.ErrorException.Message}; Error: {response.ErrorException}");
+                    }
+
+                    throw new ApplicationException($"Could not execute external search query - StatusCode: {response.StatusCode}; Content: {response.Content}");
+                }
             }
-            else if (response.StatusCode == HttpStatusCode.NoContent || response.StatusCode == HttpStatusCode.NotFound)
-                yield break;
-            else if (response.ErrorException != null)
-                throw new AggregateException(response.ErrorException.Message, response.ErrorException);
-            else
-                throw new ApplicationException("Could not execute external search query - StatusCode:" + response.StatusCode + "; Content: " + response.Content);
         }
 
         /// <inheritdoc/>
