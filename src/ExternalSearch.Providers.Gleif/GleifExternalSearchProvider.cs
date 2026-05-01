@@ -117,7 +117,7 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
 
             var client = new RestClient("https://api.gleif.org/api/v1/lei-records");
 
-            var request = new RestRequest("?page[size]=1&page[number]=1&filter[lei]=" + leiCode, Method.GET);
+            var request = new RestRequest("?page[size]=1&page[number]=1&filter[lei]=" + leiCode, Method.Get);
 
             var response = client.ExecuteAsync(request).Result;
 
@@ -186,14 +186,14 @@ namespace CluedIn.ExternalSearch.Providers.Gleif
         public ConnectionVerificationResult VerifyConnection(ExecutionContext context, IReadOnlyDictionary<string, object> config)
         {
             var client = new RestClient("https://api.gleif.org/api/v1/lei-records");
-            var request = new RestRequest("?page[size]=1&page[number]=1&filter[lei]=7ZW8QJWVPR4P1J1KQY45", Method.GET);
+            var request = new RestRequest("?page[size]=1&page[number]=1&filter[lei]=7ZW8QJWVPR4P1J1KQY45", Method.Get);
 
             var response = client.ExecuteAsync(request).Result;
 
             return ConstructVerifyConnectionResponse(response);
         }
 
-        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(RestResponse response)
         {
             var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
             if (response.ErrorException != null)
