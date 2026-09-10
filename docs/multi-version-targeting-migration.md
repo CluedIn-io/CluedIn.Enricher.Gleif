@@ -160,4 +160,4 @@ trusting it.
 - [x] Source — `#if CLUEDIN_V50` guards added for the RestSharp 106↔114 break (3 call sites in `GleifExternalSearchProvider.cs`); `src` builds clean on all three legs
 - [x] Integration tests — build and `dotnet test` pass on the 4.7.0/net6.0 leg
 - [x] `GitVersion.yml` — `next-version: 1.0`; `ignore.commits-before: 2026-03-20T00:00:00` (padded 2 days past the tag after an initial 1-day pad failed — see Step 7); verified with the pipeline's actual pinned GitVersion.Tool 5.9.0
-- [ ] Push branch and confirm the actual Azure DevOps pipeline run is green end-to-end (all three legs + `Multi-version: publish`)
+- [x] Pushed branch and confirmed the Azure DevOps pipeline is green end-to-end on the first push — PR #38, build 151864: all three legs + `Multi-version: publish` passed
