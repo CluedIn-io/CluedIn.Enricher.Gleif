@@ -1,5 +1,12 @@
 mode: ContinuousDeployment
-next-version: 5.0
+# The CluedIn version is now encoded in the published package suffix (e.g. .470/.480/.500), so this
+# repo's own version no longer needs to track CluedIn. Reset to 1.0; commits-before skips past the
+# highest pre-existing tag (4.6.1/v4.6.1, 2026-03-18T15:05:58Z). Padded 2 full days past the tag,
+# not just "the next day" - GitVersion.Tool 5.9.0 appears to parse this bare timestamp as local
+# machine time, not UTC; on a UTC+10 box a naive "day after" cutoff converted to a UTC instant
+# still *before* the tag and silently failed to exclude it (verified: MajorMinorPatch came back
+# "4.7.0", not "1.0.0", until padded further).
+next-version: 1.0
 branches:
   master:
     mode: ContinuousDelivery
@@ -26,4 +33,5 @@ branches:
     - develop
 ignore:
   sha: []
+  commits-before: 2026-03-20T00:00:00
 
