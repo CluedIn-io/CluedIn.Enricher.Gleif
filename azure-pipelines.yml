@@ -1,5 +1,21 @@
 name: $(Date:yyyyMMdd)$(Rev:.r)
 parameters:
+  # Added 2026-09-11 - this parameter never existed before, so executeIntegrationTests silently
+  # used the shared template's own `false` default with no toggle at all. Investigated whether it's
+  # safe to turn on: the only active (non-[Skip]) test, TestCompanyWithInvalidLeiCode, "passes" but
+  # is a silent no-op - confirmed via temporary debug probes on GleifExternalSearchProvider's
+  # Accepts/BuildQueries (both implementing IConfigurableExternalSearchProvider) that neither is
+  # ever invoked during the test. Same root cause as CluedIn.Enricher.VatLayer's migration (see its
+  # docs/multi-version-targeting-migration.md Step 10) - BaseExternalSearchTest<T>-family harnesses
+  # don't reliably invoke IConfigurableExternalSearchProvider's methods, so a "passing" test proves
+  # nothing. Fixing this for real needs the same bespoke bypass-the-engine treatment VatLayer's
+  # TestValidVATNumber got (a real, dedicated investigation, not a quick flag flip) - out of scope
+  # here. Left at `false`; see docs/multi-version-targeting-migration.md for the full trace.
+  - name: runIntegrationTests
+    displayName: Run Integration Tests
+    type: boolean
+    default: false
+
   - name: pipelineTemplateRef
     displayName: Pipeline Template Ref
     type: string
@@ -58,6 +74,7 @@ jobs:
       useGitVersionDotNetTool: true
       publishToDevFeed: true
       probeCluedInVersion: ${{ parameters.probeCluedInVersion }}
+      executeIntegrationTests: ${{ parameters.runIntegrationTests }}
       multiVersionCluedInTargets:
         - cluedInVersion: '4.7.0'
         - cluedInVersion: '4.8.0'
