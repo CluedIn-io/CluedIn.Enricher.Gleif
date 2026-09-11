@@ -150,6 +150,42 @@ trusting it.
 
 ---
 
+## Step 8 — Integration tests: no pipeline toggle existed; investigated whether to add one
+
+Status: **Added the toggle, left it off — the one active test is a silent no-op**
+
+`azure-pipelines.yml` never had a `runIntegrationTests`/`executeIntegrationTests` parameter wired to
+the template call at all — `executeIntegrationTests` silently used the shared template's own `false`
+default with no way to turn it on. Added the parameter (see below), then investigated whether it's
+actually safe to flip on.
+
+`test/integration/ExternalSearch.Gleif.Integration.Tests/GleifTests.cs` has 3 tests: `Test`/`Test2`
+are `[Skip]`-marked (GitHub Issue 829, unrelated to this work), leaving one active test,
+`TestCompanyWithInvalidLeiCode`. It uses a different, lower-level harness than the
+`BaseExternalSearchTest<T>` family other repos in this effort use — it drives
+`ExternalSearchProcessingAccessor.ProcessWorkflowStepAsync` directly, registering the provider via
+DI, which looked like it should exercise real production code.
+
+**It doesn't.** Added temporary `Console.WriteLine` probes to `GleifExternalSearchProvider.Accepts`
+and `BuildQueries` (both implementing `IConfigurableExternalSearchProvider`) and ran the test for
+real — **zero probe output**, despite the test reporting `Passed`. The provider's own methods are
+never invoked; the "Ignored" workflow result the test asserts is produced by something upstream of
+the provider entirely. Same root cause as `CluedIn.Enricher.VatLayer`'s migration (see its own
+`docs/multi-version-targeting-migration.md` Step 10) — `IConfigurableExternalSearchProvider` doesn't
+reliably get invoked by these test harnesses, so a green result here proves nothing. Reverted the
+debug probes (`git status` clean before proceeding).
+
+Fixing this for real would need the same bespoke, repo-specific investigation VatLayer's
+`TestValidVATNumber` got — bypassing the harness/engine entirely and driving the provider's own
+`BuildQueries`/`ExecuteSearch`/`BuildClues` pipeline directly, verified with a real (non-mocked)
+external call. That's a real, dedicated piece of work, not something to force through as part of a
+"does the flag already work" check — out of scope here.
+
+Added the `runIntegrationTests` parameter (wired to `executeIntegrationTests`), defaulted to
+`false`. Verified the integration test project still builds clean with the parameter in place.
+
+---
+
 ## Checklist
 
 - [x] `azure-pipelines.yml` — switched to `crawler.build.jobs.yml` with `multiVersionCluedInTargets` (4.7.0, 4.8.0, 5.0.0-beta.*); pool switched from `windows-latest` to `ubuntu-22.04`
@@ -161,3 +197,4 @@ trusting it.
 - [x] Integration tests — build and `dotnet test` pass on the 4.7.0/net6.0 leg
 - [x] `GitVersion.yml` — `next-version: 1.0`; `ignore.commits-before: 2026-03-20T00:00:00` (padded 2 days past the tag after an initial 1-day pad failed — see Step 7); verified with the pipeline's actual pinned GitVersion.Tool 5.9.0
 - [x] Pushed branch and confirmed the Azure DevOps pipeline is green end-to-end on the first push — PR #38, build 151864: all three legs + `Multi-version: publish` passed
+- [x] Added the missing `runIntegrationTests` parameter (previously didn't exist at all); investigated whether to enable it — the one active test is a confirmed silent no-op (same root cause as VatLayer's Step 10), left `default: false`
