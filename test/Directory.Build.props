@@ -5,12 +5,11 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <!-- Package selection (xunit v2 vs v3, Microsoft.NET.Test.Sdk version) differs per CluedIn
+       target/TFM - see Packages.props - so it's not listed here unconditionally. Each test csproj
+       adds its own conditional ItemGroups instead. -->
   <ItemGroup>
-    <PackageReference Include="AutoFixture.Xunit3"/>
     <PackageReference Include="coverlet.msbuild"/>
-    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-    <PackageReference Include="xunit.v3"/>
-    <PackageReference Include="xunit.runner.visualstudio"/>
     <PackageReference Include="Moq"/>
     <PackageReference Include="Shouldly"/>
   </ItemGroup>
