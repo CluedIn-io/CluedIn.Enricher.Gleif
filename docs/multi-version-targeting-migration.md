@@ -198,3 +198,23 @@ Added the `runIntegrationTests` parameter (wired to `executeIntegrationTests`), 
 - [x] `GitVersion.yml` — `next-version: 1.0`; `ignore.commits-before: 2026-03-20T00:00:00` (padded 2 days past the tag after an initial 1-day pad failed — see Step 7); verified with the pipeline's actual pinned GitVersion.Tool 5.9.0
 - [x] Pushed branch and confirmed the Azure DevOps pipeline is green end-to-end on the first push — PR #38, build 151864: all three legs + `Multi-version: publish` passed
 - [x] Added the missing `runIntegrationTests` parameter (previously didn't exist at all); investigated whether to enable it — the one active test is a confirmed silent no-op (same root cause as VatLayer's Step 10), left `default: false`
+
+---
+
+## Addendum — version baseline moved from 1.0.0 to 100.0.0
+
+Status: **Done**
+
+The CluedIn version is now carried entirely by the package suffix (`.470`/`.480`/`.500`), not by
+this repo's own `next-version` number, so that number moved again, from `1.0` to `100.0`. Reason:
+repos that were previously at 4.x/5.x under the old single-version-targeting scheme would appear to
+"go backwards" if their next version showed as `1.0.0` — `100.0.0` is unambiguously higher than any
+prior single-version release number this repo ever had.
+
+Unlike the original `1.0` reset, no `commits-before`/`ignore` trick is needed this time:
+`next-version` only needs help overriding an existing tag when the configured value is *lower* than
+that tag, and `100.0` is already higher than every pre-existing tag here. Removed the
+`ignore.commits-before` line entirely (kept `ignore.sha: []`).
+
+Verified with a real local `dotnet-gitversion` run: `MajorMinorPatch` resolves to `"100.0.0"`.
+`docs/1.0.0-release-notes.md` renamed to `docs/100.0.0-release-notes.md`.
