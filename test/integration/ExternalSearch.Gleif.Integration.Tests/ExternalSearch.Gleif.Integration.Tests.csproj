@@ -1,8 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="CluedIn.Testing.Base" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\src\ExternalSearch.Providers.Gleif\ExternalSearch.Providers.Gleif.csproj" />
+  </ItemGroup>
+
+  <!-- xunit v3 + AutoFixture.Xunit3 + CluedIn.Testing.Base.500 for net10.0 (CluedIn 5.0+) -->
+  <ItemGroup Condition="$(DefineConstants.Contains('CLUEDIN_V50'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="AutoFixture.Xunit3" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="CluedIn.Testing.Base.$(_CluedInVersionSuffix)" />
+  </ItemGroup>
+  <!-- xunit v2 + AutoFixture.Xunit2 + CluedIn.Testing.Base.470/.480 for net6.0 (CluedIn < 5.0) -->
+  <ItemGroup Condition="!$(DefineConstants.Contains('CLUEDIN_V50'))">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="AutoFixture.Xunit2" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="CluedIn.Testing.Base.$(_CluedInVersionSuffix)" />
   </ItemGroup>
 </Project>
