@@ -135,6 +135,7 @@ namespace CluedIn.Provider.Gleif
             { "vocabKeyPrefix", GleifVocabularies.Organization.KeyPrefix},
             { "autoSubmission", false },
             { "dataSourceSetId", string.Empty },
+            { "fieldGroups", Constants.FieldGroups }, // for UI
         };
     }
 }
